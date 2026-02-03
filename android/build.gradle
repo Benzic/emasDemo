@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
   ext {
     // 根据你当前 Expo SDK 调整版本：
@@ -7,53 +6,77 @@ buildscript {
     agpVersion    = "8.13.0"
     reactNativeGradlePluginVersion = "0.81.5" // 或与你项目 package.json 中 RN 版本一致
     apmVersion = "3.0.4" // 统一管理 APM 版本
+    // 补充：指定 Expo 插件版本（可选，根据你的 expo SDK 版本对应）
+    expoGradlePluginVersion = "5.0.0"
   }
+
   repositories {
-// 华为云Android仓库
+    // 核心优化1：国内镜像优先，放在最前面（精简为 华为云 + 阿里云 EMAS 专属，足够满足依赖）
+    // 1. 华为云（优先，你的项目原有依赖）
     maven { url 'https://mirrors.huaweicloud.com/repository/google/' }
-    // 华为云中央仓库
     maven { url 'https://mirrors.huaweicloud.com/repository/maven/' }
-    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/google/' }
-    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
-    // 保留项目原有华为仓库
     maven { url 'https://developer.huawei.com/repo/' }
-    // 3. 阿里云（拉取aliyun.com相关依赖）
+    // 2. 阿里云（EMAS 必备，专属仓库优先）
+    maven { url 'https://emas.aliyun.com/maven/repository/' } // EMAS 核心仓库，最优先
     maven { url 'https://maven.aliyun.com/repository/google' }
     maven { url 'https://maven.aliyun.com/repository/public' }
-    // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
-    maven { url 'https://emas.aliyun.com/maven/repository/' }
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+
+    // 3. 官方仓库（放在国内镜像后，仅作为兜底，避免依赖缺失）
     google()
     mavenCentral()
+
+    // 精简：移除腾讯云镜像（与华为/阿里云功能重复，减少遍历）
   }
+
   dependencies {
     classpath("com.android.tools.build:gradle:${agpVersion}")
     classpath("com.facebook.react:react-native-gradle-plugin:${reactNativeGradlePluginVersion}")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("com.aliyun.ams:alicloud-apm-plugin:${apmVersion}")
+    // 核心优化2：明确指定 Expo Gradle 插件依赖（避免 Gradle 自动查找超时）
+    classpath("expo:expo-gradle-plugin:${expoGradlePluginVersion}")
   }
 }
 
 allprojects {
   repositories {
-    google()
-    mavenCentral()
-    maven { url 'https://www.jitpack.io' }// 华为云Android仓库
+    // 与 buildscript 保持一致，精简国内镜像，提升优先级
+    // 1. 华为云
     maven { url 'https://mirrors.huaweicloud.com/repository/google/' }
-    // 华为云中央仓库
     maven { url 'https://mirrors.huaweicloud.com/repository/maven/' }
-    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/google/' }
-    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
-    // 保留项目原有华为仓库
     maven { url 'https://developer.huawei.com/repo/' }
-    // 3. 阿里云（拉取aliyun.com相关依赖）
+    // 2. 阿里云（EMAS 必备）
+    maven { url 'https://emas.aliyun.com/maven/repository/' }
     maven { url 'https://maven.aliyun.com/repository/google' }
     maven { url 'https://maven.aliyun.com/repository/public' }
-    // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
-    maven { url 'https://emas.aliyun.com/maven/repository/' }
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+    // 3. 其他必要仓库（仅保留 jitpack，按需添加）
+    maven { url 'https://www.jitpack.io' }
+    // 4. 官方仓库（兜底）
+    google()
+    mavenCentral()
+
+    // 精简：移除腾讯云镜像，注释格式整理
   }
 }
 
+// 核心优化3：添加 Gradle 构建优化配置（解决超时、提升速度）
+gradle.startParameter {
+  // 开启并行构建
+  parallelProjectExecution = true
+  // 关闭构建缓存校验（云构建缓存可能存在脏数据）
+  buildCacheEnabled = false
+}
+
+// 核心优化4：指定 Expo 插件仓库来源（裸工作流必备，避免解析失败）
+project.ext {
+  expo = [
+          // 指向国内镜像，拉取 Expo 相关依赖
+          mavenRepositoryUrl: "https://maven.aliyun.com/repository/public"
+  ]
+}
+
+// 原有插件应用，保持不变
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
