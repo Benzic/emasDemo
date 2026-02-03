@@ -8,6 +8,7 @@ import { Text, View } from './Themed';
 import Colors from '@/constants/Colors';
 import ErrorButton from './Error';
 import OpenCarmeraExpo from './OpenCarmeraExpo';
+import OpenCarmeraNative from './OpenCarmeraNative';
 export default function EditScreenInfo({ path }: { path: string }) {
   return (
     <View>
@@ -44,6 +45,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
       </View>
       <ErrorButton></ErrorButton> 
       <OpenCarmeraExpo></OpenCarmeraExpo>
+      <OpenCarmeraNative></OpenCarmeraNative>
     </View>
   );
 }

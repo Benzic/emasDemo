@@ -1,0 +1,59 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+  ext {
+    // 根据你当前 Expo SDK 调整版本：
+    kotlinVersion = "2.0.21"
+    agpVersion    = "8.13.0"
+    reactNativeGradlePluginVersion = "0.81.5" // 或与你项目 package.json 中 RN 版本一致
+    apmVersion = "3.0.4" // 统一管理 APM 版本
+  }
+  repositories {
+// 华为云Android仓库
+    maven { url 'https://mirrors.huaweicloud.com/repository/google/' }
+    // 华为云中央仓库
+    maven { url 'https://mirrors.huaweicloud.com/repository/maven/' }
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/google/' }
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+    // 保留项目原有华为仓库
+    maven { url 'https://developer.huawei.com/repo/' }
+    // 3. 阿里云（拉取aliyun.com相关依赖）
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
+    maven { url 'https://emas.aliyun.com/maven/repository/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+    google()
+    mavenCentral()
+  }
+  dependencies {
+    classpath("com.android.tools.build:gradle:${agpVersion}")
+    classpath("com.facebook.react:react-native-gradle-plugin:${reactNativeGradlePluginVersion}")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+    classpath("com.aliyun.ams:alicloud-apm-plugin:${apmVersion}")
+  }
+}
+
+allprojects {
+  repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }// 华为云Android仓库
+    maven { url 'https://mirrors.huaweicloud.com/repository/google/' }
+    // 华为云中央仓库
+    maven { url 'https://mirrors.huaweicloud.com/repository/maven/' }
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/google/' }
+    maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+    // 保留项目原有华为仓库
+    maven { url 'https://developer.huawei.com/repo/' }
+    // 3. 阿里云（拉取aliyun.com相关依赖）
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
+    maven { url 'https://emas.aliyun.com/maven/repository/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+  }
+}
+
+apply plugin: "expo-root-project"
+apply plugin: "com.facebook.react.rootproject"
