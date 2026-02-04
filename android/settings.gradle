@@ -23,8 +23,9 @@ pluginManagement {
         // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
         maven { url 'https://emas.aliyun.com/maven/repository/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
@@ -39,8 +40,9 @@ dependencyResolutionManagement {
         // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
         maven { url 'https://emas.aliyun.com/maven/repository/' }
         maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
+        gradlePluginPortal()
     }
 }
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
