@@ -21,9 +21,9 @@ buildscript {
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
 
     // 3. 官方仓库（放在国内镜像后，仅作为兜底，避免依赖缺失）
-//    google()
-//    mavenCentral()
-    gradlePluginPortal()
+    google()
+    mavenCentral()
+
     // 精简：移除腾讯云镜像（与华为/阿里云功能重复，减少遍历）
   }
 
@@ -50,9 +50,8 @@ allprojects {
     // 3. 其他必要仓库（仅保留 jitpack，按需添加）
     maven { url 'https://www.jitpack.io' }
     // 4. 官方仓库（兜底）
-//    google()
-//    mavenCentral()
-    gradlePluginPortal()
+    google()
+    mavenCentral()
 
     // 精简：移除腾讯云镜像，注释格式整理
   }
