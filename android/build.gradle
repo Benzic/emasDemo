@@ -6,8 +6,6 @@ buildscript {
     agpVersion    = "8.13.0"
     reactNativeGradlePluginVersion = "0.81.5" // 或与你项目 package.json 中 RN 版本一致
     apmVersion = "3.0.4" // 统一管理 APM 版本
-    // 补充：指定 Expo 插件版本（可选，根据你的 expo SDK 版本对应）
-    expoGradlePluginVersion = "5.0.0"
   }
 
   repositories {
@@ -23,8 +21,8 @@ buildscript {
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
 
     // 3. 官方仓库（放在国内镜像后，仅作为兜底，避免依赖缺失）
-    google()
-    mavenCentral()
+//    google()
+//    mavenCentral()
 
     // 精简：移除腾讯云镜像（与华为/阿里云功能重复，减少遍历）
   }
@@ -34,8 +32,6 @@ buildscript {
     classpath("com.facebook.react:react-native-gradle-plugin:${reactNativeGradlePluginVersion}")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("com.aliyun.ams:alicloud-apm-plugin:${apmVersion}")
-    // 核心优化2：明确指定 Expo Gradle 插件依赖（避免 Gradle 自动查找超时）
-    classpath("expo:expo-gradle-plugin:${expoGradlePluginVersion}")
   }
 }
 
@@ -54,8 +50,8 @@ allprojects {
     // 3. 其他必要仓库（仅保留 jitpack，按需添加）
     maven { url 'https://www.jitpack.io' }
     // 4. 官方仓库（兜底）
-    google()
-    mavenCentral()
+//    google()
+//    mavenCentral()
 
     // 精简：移除腾讯云镜像，注释格式整理
   }
