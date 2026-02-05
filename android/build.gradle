@@ -9,7 +9,7 @@ buildscript {
   }
 
   repositories {
-    // 完全保留你的镜像优先级（华为云→阿里云EMAS→官方）
+    // 完全保留你的镜像优先级
     maven { url 'https://mirrors.huaweicloud.com/repository/google/' }
     maven { url 'https://mirrors.huaweicloud.com/repository/maven/' }
     maven { url 'https://developer.huawei.com/repo/' }
@@ -27,6 +27,8 @@ buildscript {
     classpath("com.facebook.react:react-native-gradle-plugin:${reactNativeGradlePluginVersion}")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("com.aliyun.ams:alicloud-apm-plugin:${apmVersion}")
+    // 新增：手动引入Expo Gradle插件，避免插件解析时触发兼容问题
+    classpath("expo:expo-gradle-plugin:local")
   }
 }
 
@@ -46,7 +48,7 @@ allprojects {
   }
 }
 
-// 核心修改3：Gradle8.x 正确的startParameter配置写法（修复原语法兼容问题）
+// 保留Gradle8.x 正确的startParameter配置
 gradle.startParameter.parallelProjectExecution = true
 gradle.startParameter.buildCacheEnabled = false
 
@@ -57,6 +59,6 @@ project.ext {
   ]
 }
 
-// 保留原有插件应用
+// 保留原有插件应用，确保Expo和RN核心功能正常
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"

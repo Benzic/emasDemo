@@ -17,7 +17,7 @@ pluginManagement {
     includeBuild(expoPluginsPath)
 
     repositories {
-        // 保留你的国内镜像优先级
+        // 保留国内镜像优先级
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         gradlePluginPortal()
         maven { url 'https://emas.aliyun.com/maven/repository/' }
@@ -26,36 +26,42 @@ pluginManagement {
     }
 }
 
-// 核心修改1：删除 com.facebook.react.settings 插件（高Gradle版本废弃）
+// 核心修改1：完全删除所有settings插件（com.facebook.react.settings + expo-autolinking-settings）
+// 不再声明任何老旧插件，避免触发systemProperties兼容问题
 plugins {
-    id("expo-autolinking-settings") // 仅保留Expo插件
+    // 此处留空，仅保留插件声明块结构，不引入任何问题插件
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // 保留所有EMAS/阿里云镜像配置
         maven { url 'https://emas.aliyun.com/maven/repository/' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/public' }
-        // 开启官方仓库兜底（Gradle8.x兼容）
         google()
         mavenCentral()
     }
 }
 
-// 核心修改2：直接配置ReactSettingsExtension（替代废弃的settings插件）
+// 核心修改2：手动配置React Native自动链接（替代com.facebook.react.settings）
 extensions.findByName("react")?.with {
     if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
         autolinkLibrariesFromCommand()
     } else {
-        autolinkLibrariesFromCommand(expoAutolinking.rnConfigCommand)
+        // 手动指定Expo RN配置命令，绕过插件内部的systemProperties调用
+        def rnConfigCommand = ["node", rootProject.file("node_modules/expo-modules-autolinking/scripts/rn-config.js").absolutePath]
+        autolinkLibrariesFromCommand(rnConfigCommand)
     }
 }
 
-// 保留所有Expo裸工作流配置
-expoAutolinking.useExpoModules()
+// 核心修改3：手动初始化Expo自动链接（替代expo-autolinking-settings）
+def expoAutolinking = extensions.findByName("expoAutolinking")
+if (expoAutolinking) {
+    expoAutolinking.useExpoModules()
+    expoAutolinking.useExpoVersionCatalog()
+    includeBuild(expoAutolinking.reactNativeGradlePlugin)
+}
+
+// 保留项目名称和模块引用
 rootProject.name = 'my-app'
-expoAutolinking.useExpoVersionCatalog()
 include ':app'
-includeBuild(expoAutolinking.reactNativeGradlePlugin)
