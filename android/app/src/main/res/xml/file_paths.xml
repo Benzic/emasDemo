@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 配置图片存储路径，RN 可访问 -->
-    <external-files-path name="my_photos" path="Pictures/" />
-</paths>
