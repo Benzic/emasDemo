@@ -15,20 +15,30 @@ pluginManagement {
             "../android/expo-gradle-plugin"
     ).absolutePath
     includeBuild(expoPluginsPath)
+
     repositories {
-        // 关键：添加 Gradle 插件仓库国内镜像（优先，解决外网访问问题）
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        // 关键：添加 Gradle 官方插件仓库（备用，插件的原生来源）
+        // 优先级 1：Gradle 插件专属国内镜像（仅解析 Gradle 插件，核心）
+        maven {
+            url 'https://maven.aliyun.com/repository/gradle-plugin'
+            // 限定只解析插件相关依赖，提升速度
+            content {
+                includeGroup("org.gradle.toolchains")
+                includeGroup("com.facebook.react")
+                includeGroup("expo")
+            }
+        }
+        // 优先级 2：Gradle 官方插件仓库（备用，仅当镜像失效时使用）
         gradlePluginPortal()
-        //阿里云仓库，需要在这里添加插件仓库
-        // 3. 阿里云（拉取aliyun.com相关依赖）
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
-        maven { url 'https://emas.aliyun.com/maven/repository/' }
-        maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
-        google()
-        mavenCentral()
+
+        // 优先级 3：阿里云核心依赖仓库（仅插件所需的基础依赖，精简）
+        maven {
+            url 'https://emas.aliyun.com/maven/repository/'
+            content { includeGroup("com.aliyun.ams") }
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/public'
+            content { includeGroupByRegex("com\\.facebook.*", "expo.*", "org\\.jetbrains.*") }
+        }
     }
 }
 
@@ -36,17 +46,32 @@ plugins {
     id("com.facebook.react.settings")
     id("expo-autolinking-settings")
 }
+
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        // 2. com.aliyun.ams 对应的专属仓库（关键，必须添加）
-        maven { url 'https://emas.aliyun.com/maven/repository/' }
-        maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
-        google()
-        mavenCentral()
+        // 优先级 1：业务专属仓库（EMAS，核心，必须在前）
+        maven {
+            url 'https://emas.aliyun.com/maven/repository/'
+            content { includeGroup("com.aliyun.ams") }
+        }
+        // 优先级 2：阿里云 Google 镜像（替代 google()，避免 TLS 问题）
+        maven {
+            url 'https://maven.aliyun.com/repository/google'
+            content { includeGroupByRegex("com\\.android.*", "com\\.google.*") }
+        }
+        // 优先级 3：阿里云公共仓库（替代 mavenCentral()，覆盖大部分依赖）
+        maven {
+            url 'https://maven.aliyun.com/repository/public'
+            content { includeGroupByRegex(".*") }
+        }
+
+        // 备用：官方仓库（云构建环境中注释掉，避免 TLS 问题，如需本地调试可取消注释）
+        // google()
+        // mavenCentral()
     }
 }
+
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
     if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
         ex.autolinkLibrariesFromCommand()
@@ -54,6 +79,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
         ex.autolinkLibrariesFromCommand(expoAutolinking.rnConfigCommand)
     }
 }
+
 expoAutolinking.useExpoModules()
 
 rootProject.name = 'my-app'
