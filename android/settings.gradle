@@ -17,52 +17,45 @@ pluginManagement {
     includeBuild(expoPluginsPath)
 
     repositories {
-        // 核心：Gradle 插件国内镜像（优先）
+        // 保留你的国内镜像优先级
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        // 核心：Gradle 官方插件仓库（备用）
         gradlePluginPortal()
-
-        // 阿里云核心仓库（保证依赖拉取）
         maven { url 'https://emas.aliyun.com/maven/repository/' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/public' }
     }
 }
 
+// 核心修改1：删除 com.facebook.react.settings 插件（高Gradle版本废弃）
 plugins {
-    id("com.facebook.react.settings")
-    id("expo-autolinking-settings")
+    id("expo-autolinking-settings") // 仅保留Expo插件
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // 业务专属仓库（EMAS）
+        // 保留所有EMAS/阿里云镜像配置
         maven { url 'https://emas.aliyun.com/maven/repository/' }
-        // Google 镜像仓库
         maven { url 'https://maven.aliyun.com/repository/google' }
-        // 公共仓库（覆盖大部分依赖）
         maven { url 'https://maven.aliyun.com/repository/public' }
-
-        // 备用官方仓库（注释掉，避免 TLS 问题）
-        // google()
-        // mavenCentral()
+        // 开启官方仓库兜底（Gradle8.x兼容）
+        google()
+        mavenCentral()
     }
 }
 
-extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
+// 核心修改2：直接配置ReactSettingsExtension（替代废弃的settings插件）
+extensions.findByName("react")?.with {
     if (System.getenv('EXPO_USE_COMMUNITY_AUTOLINKING') == '1') {
-        ex.autolinkLibrariesFromCommand()
+        autolinkLibrariesFromCommand()
     } else {
-        ex.autolinkLibrariesFromCommand(expoAutolinking.rnConfigCommand)
+        autolinkLibrariesFromCommand(expoAutolinking.rnConfigCommand)
     }
 }
 
+// 保留所有Expo裸工作流配置
 expoAutolinking.useExpoModules()
-
 rootProject.name = 'my-app'
-
 expoAutolinking.useExpoVersionCatalog()
-
 include ':app'
 includeBuild(expoAutolinking.reactNativeGradlePlugin)
