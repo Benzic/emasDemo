@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-       "infoPlist": {
+      "infoPlist": {
         "NSCameraUsageDescription": "需要访问相机来拍摄照片",
         "NSPhotoLibraryUsageDescription": "需要访问相册来选择图片"
       }
@@ -44,6 +44,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7a81b3af-96cd-4660-a6f9-cfff38ce925b"
+      }
     }
   }
 }
